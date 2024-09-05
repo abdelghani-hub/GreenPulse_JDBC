@@ -8,8 +8,6 @@ public class Main {
 
     public static void main(String[] args) {
 
-        // De-Serialization
-
         boolean running = true;
 
         while (running) {
@@ -18,7 +16,7 @@ public class Main {
 
             switch (choice) {
                 case "1":
-                    createUser();
+                    userService.addUser();
                     break;
                 case "2":
                     updateUser();
@@ -48,89 +46,50 @@ public class Main {
         }
     }
 
-    private static void createUser() {
-        System.out.print("\nEnter name : ");
-        String name = ConsoleUI.scanner.nextLine();
-
-        int age = ConsoleUI.readInt("Enter age  : ");
-
-        User user = new User(name, age);
-        userService.addUser(user);
-    }
-
     private static void updateUser() {
-        int id = ConsoleUI.readInt("\nEnter user id : ");
-        User user = userService.getUser(id);
-
-        if (user != null) {
-            userService.updateUser(user);
-        } else {
-            ConsoleUI.displayErrorMessage("User not found.");
-        }
+        User user = userService.getUser();
+        userService.updateUser(user);
     }
 
     private static void deleteUser() {
-        int id = ConsoleUI.readInt("Enter user id : ");
-        if (userService.getUser(id) != null) {
-            ConsoleUI.displayWarningMessage("Are you sur you want to delete this user (Y/N) : ");
-            String conf = ConsoleUI.scanner.nextLine();
-            if (conf.equalsIgnoreCase("y")) {
-                boolean isDeleted = userService.deleteUser(id);
-                if (isDeleted) ConsoleUI.displaySuccessMessage("User deleted successfully.");
-                else ConsoleUI.displayErrorMessage("Server Error!");
-            } else {
-                ConsoleUI.displaySuccessMessage("Operation has been canceled successfully.");
-            }
+        User user = userService.getUser();
+        ConsoleUI.displayWarningMessage("Are you sur you want to delete this user (Y/N) : ");
+        String conf = ConsoleUI.scanner.nextLine();
+        if (conf.equalsIgnoreCase("y")) {
+            userService.deleteUser(user.getId());
         } else {
-            ConsoleUI.displayErrorMessage("User not found!");
+            ConsoleUI.displaySuccessMessage("Operation has been canceled successfully.");
         }
     }
 
     private static void viewUser() {
-        int id = ConsoleUI.readInt("\nEnter user id : ");
-        User user = userService.getUser(id);
-
-        if (user != null) {
-            userService.showUser(user);
-        } else {
-            ConsoleUI.displayErrorMessage("User not found!");
-        }
+        User user = userService.getUser();
+        userService.showUser(user);
     }
 
     // Add Carbon Consumption
     public static void addCarbonConsumption() {
-        int userID = ConsoleUI.readInt("\nEnter the user id : ");
-        User user = userService.getUser(userID);
-
-        if (user != null) {
-            CarbonConsumptionService.addCarbonConsumption(user);
-        } else {
-            ConsoleUI.displayErrorMessage("User not found!");
-        }
+        User user = userService.getUser();
+        CarbonConsumptionService.addCarbonConsumption(user);
     }
 
     // Generate Carbon Consumption Report
     public static void generateCarbonReport() {
-        int userID = ConsoleUI.readInt("Enter the user id : ");
-        User user = userService.getUser(userID);
-        if (user != null) {
-            ConsoleUI.displayReportMenu();
-            String reportChoice = ConsoleUI.scanner.nextLine();
-            switch (reportChoice) {
-                case "1":
-                    CarbonConsumptionService.generateDailyReport(user);
-                    break;
-                case "2":
-                    CarbonConsumptionService.generateWeeklyReport(user);
-                    break;
-                case "3":
-                    CarbonConsumptionService.generateMonthlyReport(user);
-                    break;
-                default:
-                    ConsoleUI.displayErrorMessage("Invalid choice. Please try again.");
-            }
-        } else {
-            ConsoleUI.displayErrorMessage("User not found!");
+        User user = userService.getUser();
+        ConsoleUI.displayReportMenu();
+        String reportChoice = ConsoleUI.scanner.nextLine();
+        switch (reportChoice) {
+            case "1":
+                CarbonConsumptionService.generateDailyReport(user);
+                break;
+            case "2":
+                CarbonConsumptionService.generateWeeklyReport(user);
+                break;
+            case "3":
+                CarbonConsumptionService.generateMonthlyReport(user);
+                break;
+            default:
+                ConsoleUI.displayErrorMessage("Invalid choice. Please try again.");
         }
     }
 }

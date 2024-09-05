@@ -20,7 +20,20 @@ public class UserService {
     }
 
     // Method to add a new user
-    public void addUser(User user) {
+    public void addUser() {
+        String name;
+        while (true) {
+            System.out.print("\nEnter name : ");
+            name = ConsoleUI.scanner.nextLine();
+            if (name.length() < 3)
+                ConsoleUI.displayErrorMessage("Name must not be empty!");
+            else
+                break;
+        }
+
+        int age = ConsoleUI.readInt("Enter age  : ");
+
+        User user = new User(name, age);
         if (users.containsKey(user.getId())) {
             ConsoleUI.displayErrorMessage("ID already exists, Try an other one.");
         } else {
@@ -30,8 +43,15 @@ public class UserService {
     }
 
     // Method to retrieve a user by their unique ID
-    public User getUser(int id) {
-        return users.get(id);
+    public User getUser() {
+        while (true) {
+            int id = ConsoleUI.readInt("\nEnter user id : ");
+            User user = users.get(id);
+            if (user != null)
+                return user;
+            else
+                ConsoleUI.displayErrorMessage("User not found !");
+        }
     }
 
     // Method to update an existing user
@@ -53,12 +73,12 @@ public class UserService {
     }
 
     // Method to delete a user by their unique ID
-    public boolean deleteUser(int id) {
+    public void deleteUser(int id) {
         if (users.containsKey(id)) {
             users.remove(id);
-            return true;
-        }
-        return false;
+            ConsoleUI.displaySuccessMessage("User deleted successfully.");
+        } else
+            ConsoleUI.displayErrorMessage("Server Error!");
     }
 
     // Show single user
