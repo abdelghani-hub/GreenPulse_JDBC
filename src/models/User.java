@@ -3,33 +3,47 @@ package models;
 import utils.ConsoleUI;
 
 import java.util.ArrayList;
+import java.util.UUID;
 import java.util.concurrent.atomic.AtomicInteger;
 
 public class User {
     private String name;
     private int age;
+    private final String id;
 
-    private final int id;
-    private static final AtomicInteger idCounter = new AtomicInteger();
-
-
-    private final ArrayList<CarbonConsumption> carbonConsumption;
+    private final ArrayList<Consumption> consumptions;
 
     // Constructor
     public User(String name, int age) {
         this.name = name;
         this.age = age;
         this.id = generateUniqueID();
-        this.carbonConsumption = new ArrayList<>();
+        this.consumptions = new ArrayList<>();
     }
 
     // Id Generator
-    private static int generateUniqueID() {
-        return idCounter.incrementAndGet();
+    private static String generateUniqueID() {
+        return UUID.randomUUID().toString();
     }
 
-    // Getters and Setters
+    // Getters
+    public String getName() {
+        return name;
+    }
 
+    public int getAge() {
+        return age;
+    }
+
+    public ArrayList<Consumption> getConsumptions() {
+        return consumptions;
+    }
+
+    public String getId() {
+        return id;
+    }
+
+    // Setters
     public void setName(String name) {
         this.name = name;
     }
@@ -38,24 +52,20 @@ public class User {
         this.age = age;
     }
 
-    public int getId() {
-        return id;
-    }
-
-    public ArrayList<CarbonConsumption> getCarbonConsumption() {
-        return carbonConsumption;
+    public ArrayList<Consumption> getCarbonConsumption() {
+        return consumptions;
     }
 
     // Add a Carbon consumption to the list
-    public void addCarbonConsumption(CarbonConsumption consumption) {
-        this.carbonConsumption.add(consumption);
+    public void addCarbonConsumption(Consumption consumption) {
+        this.consumptions.add(consumption);
     }
 
     // Show User infos
     @Override
     public String toString() {
         StringBuilder carbonConsumptionSTR = new StringBuilder();
-        for(CarbonConsumption c: carbonConsumption){
+        for(Consumption c: consumptions){
             carbonConsumptionSTR.append("\t#").append(c.getId())
                                 .append(": ").append(ConsoleUI.BLUE).append(c.getQuantity()).append(ConsoleUI.RESET)
                                 .append(" from ").append(c.getStartDate())
@@ -66,7 +76,7 @@ public class User {
                 "id          : " + id + "\n" +
                 "name        : " + name + "\n" +
                 "age         : " + age + "\n" +
-                "Consumption : " + ConsoleUI.YELLOW + getConsumptionTotal() + ConsoleUI.RESET + "\n" +
+                "Consumption : " + ConsoleUI.YELLOW + getConsumptionTotal() + ConsoleUI.RESET + " CO2eq\n" +
                 carbonConsumptionSTR;
     }
 
@@ -79,8 +89,8 @@ public class User {
 
     // Consumption Total
     public double getConsumptionTotal() {
-        return carbonConsumption.stream()
-                .mapToDouble(CarbonConsumption::getQuantity)
+        return consumptions.stream()
+                .mapToDouble(Consumption::getQuantity)
                 .reduce(0, Double::sum);
     }
 }
