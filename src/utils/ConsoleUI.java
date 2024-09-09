@@ -3,6 +3,7 @@ package utils;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
+import java.util.Map;
 import java.util.Scanner;
 
 public class ConsoleUI {
@@ -17,22 +18,22 @@ public class ConsoleUI {
     public static void displayMenu() {
         System.out.print(
                 "\n |=================================|" +
-                "\n |  " + ORANGE + "Carbon Consumption Management" + RESET + "  |" +
-                "\n |=================================|" +
-                "\n | 1. Create User                  |" +
-                "\n | 2. Update User                  |" +
-                "\n | 3. Delete User                  |" +
-                "\n | 4. Show User                    |" +
-                "\n | 5. Show All users               |" +
-                "\n | 6. Add Carbon Consumption       |" +
-                "\n | 7. Generate Carbon report       |" +
-                "\n |" + BLUE + " 8. Exit" + RESET + "                         |" +
-                "\n |_________________________________|" +
-                "\n  Enter your choice : "
+                        "\n |  " + ORANGE + "Carbon Consumption Management" + RESET + "  |" +
+                        "\n |=================================|" +
+                        "\n | 1. Create User                  |" +
+                        "\n | 2. Update User                  |" +
+                        "\n | 3. Delete User                  |" +
+                        "\n | 4. Show User                    |" +
+                        "\n | 5. Show All users               |" +
+                        "\n | 6. Add Carbon Consumption       |" +
+                        "\n | 7. Generate Carbon report       |" +
+                        "\n |" + BLUE + " 8. Exit" + RESET + "                         |" +
+                        "\n |_________________________________|" +
+                        "\n  Enter your choice : "
         );
     }
 
-    public static void displayReportMenu(){
+    public static void displayReportMenu() {
         System.out.print(
                 "\n\t |----------------------|" +
                 "\n\t | 1. Daily Report      |" +
@@ -43,15 +44,15 @@ public class ConsoleUI {
         );
     }
 
-    public static void displayErrorMessage(String message) {
-        System.out.println(RED + "\nError: " + message + RESET);
+    public static void printError(String message) {
+        System.err.println("Error: " + message);
     }
 
-    public static void displaySuccessMessage(String message) {
+    public static void printSuccess(String message) {
         System.out.println(GREEN + "\nSuccess: " + message + RESET);
     }
 
-    public static void displayWarningMessage(String message) {
+    public static void printWarning(String message) {
         System.out.print(YELLOW + "\nWarning: " + message + RESET);
     }
 
@@ -67,7 +68,7 @@ public class ConsoleUI {
                 date = LocalDate.parse(input, formatter);
                 valid = true;
             } catch (DateTimeParseException e) {
-                ConsoleUI.displayErrorMessage("Invalid format. Please try again ( dd/mm/YYYY ) : ");
+                ConsoleUI.printError("Invalid format. Please try again ( dd/mm/YYYY ) : ");
             }
         }
         return date;
@@ -84,11 +85,47 @@ public class ConsoleUI {
                 result = scanner.nextInt();
                 validInput = true;
             } else {
-                displayErrorMessage("Invalid input. Please enter a valid integer.");
+                printError("Invalid input. Please enter a valid integer.");
             }
             scanner.nextLine();
         }
 
         return result;
+    }
+    // Method for handling the Input Mismatch Exception
+    public static double readDouble(String prompt) {
+        double result = 0;
+        boolean validInput = false;
+
+        while (!validInput) {
+            System.out.print(prompt);
+            if (scanner.hasNextDouble()) {
+                result = scanner.nextDouble();
+                validInput = true;
+            } else {
+                printError("Invalid input. Please enter a valid Double.");
+            }
+            scanner.nextLine();
+        }
+        return result;
+    }
+
+    public static String readChoice(String prompt, Map<String, String> choices) {
+        StringBuilder choicesSTR = new StringBuilder("\t|------------------|\n");
+        for (Map.Entry<String, String> choice : choices.entrySet()) {
+            choicesSTR.append(choice.getKey())
+                    .append(". ")
+                    .append(choice.getValue())
+                    .append("\n|__________________|\n")
+                    .append(prompt);
+        }
+        while (true) {
+            System.out.print(choicesSTR);
+            String choice = scanner.nextLine().trim();
+            if (!choices.containsValue(choice))
+                printError("invalid choice!");
+            else
+                return choice;
+        }
     }
 }

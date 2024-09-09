@@ -4,16 +4,22 @@ import utils.ConsoleUI;
 
 import java.util.ArrayList;
 import java.util.UUID;
-import java.util.concurrent.atomic.AtomicInteger;
 
 public class User {
     private String name;
     private int age;
-    private final String id;
+    private String id;
 
     private final ArrayList<Consumption> consumptions;
 
-    // Constructor
+    // Constructors
+
+    public User(){
+        this.name = "";
+        this.age = 0;
+        this.id = "";
+        this.consumptions = new ArrayList<>();
+    }
     public User(String name, int age) {
         this.name = name;
         this.age = age;
@@ -41,6 +47,10 @@ public class User {
 
     public String getId() {
         return id;
+    }
+
+    public void setId(String id) {
+        this.id = id;
     }
 
     // Setters

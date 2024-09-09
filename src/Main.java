@@ -1,7 +1,10 @@
+import config.DBConnection;
 import models.User;
-import services.CarbonConsumptionService;
 import services.UserService;
 import utils.ConsoleUI;
+
+import java.sql.Connection;
+import java.sql.SQLException;
 
 public class Main {
     private static final UserService userService = new UserService();
@@ -19,62 +22,43 @@ public class Main {
                     userService.addUser();
                     break;
                 case "2":
-                    updateUser();
+                    userService.edit();
                     break;
                 case "3":
-                    deleteUser();
+                    userService.delete();
                     break;
                 case "4":
-                    viewUser();
+                    userService.showUser();
                     break;
                 case "5":
                     userService.listAllUsers();
                     break;
                 case "6":
-                    addCarbonConsumption();
+                    //addCarbonConsumption();
                     break;
                 case "7":
-                    generateCarbonReport();
+//                    generateCarbonReport();
                     break;
                 case "8":
                     running = false;
                     System.out.println("Exiting the application...");
                     break;
                 default:
-                    ConsoleUI.displayErrorMessage("Invalid choice. Please try again.");
+                    ConsoleUI.printError("Invalid choice. Please try again.");
             }
         }
     }
 
-    private static void updateUser() {
-        User user = userService.getUser();
-        userService.updateUser(user);
-    }
 
-    private static void deleteUser() {
-        User user = userService.getUser();
-        ConsoleUI.displayWarningMessage("Are you sur you want to delete this user (Y/N) : ");
-        String conf = ConsoleUI.scanner.nextLine();
-        if (conf.equalsIgnoreCase("y")) {
-            userService.deleteUser(user.getId());
-        } else {
-            ConsoleUI.displaySuccessMessage("Operation has been canceled successfully.");
-        }
-    }
-
-    private static void viewUser() {
-        User user = userService.getUser();
-        userService.showUser(user);
-    }
 
     // Add Carbon Consumption
-    public static void addCarbonConsumption() {
+    /*public static void addCarbonConsumption() {
         User user = userService.getUser();
-        CarbonConsumptionService.addCarbonConsumption(user);
-    }
+//        CarbonConsumptionService.create(user);
+    }*/
 
     // Generate Carbon Consumption Report
-    public static void generateCarbonReport() {
+/*    public static void generateCarbonReport() {
         User user = userService.getUser();
         ConsoleUI.displayReportMenu();
         String reportChoice = ConsoleUI.scanner.nextLine();
@@ -91,5 +75,5 @@ public class Main {
             default:
                 ConsoleUI.displayErrorMessage("Invalid choice. Please try again.");
         }
-    }
+    }*/
 }

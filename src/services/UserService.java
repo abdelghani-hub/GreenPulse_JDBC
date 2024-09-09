@@ -1,22 +1,18 @@
 package services;
 
-import models.CarbonConsumption;
-import models.User;
+import models.*;
+import repositories.UserRepository;
 import utils.ConsoleUI;
 
-import java.time.LocalDate;
-import java.util.HashMap;
-import java.util.Scanner;
+import java.util.List;
+import java.util.Optional;
 
 public class UserService {
-    // A HashMap to store users with their uniqueID as the key
-    protected HashMap<Integer, User> users;
-    private static final Scanner scanner = new Scanner(System.in);
+    private final UserRepository userRepo;
 
     // Construct
     public UserService() {
-        this.users = new HashMap<>();
-        seeder();
+        this.userRepo = new UserRepository();
     }
 
     // Method to add a new user
@@ -25,8 +21,8 @@ public class UserService {
         while (true) {
             System.out.print("\nEnter name : ");
             name = ConsoleUI.scanner.nextLine();
-            if (name.length() < 3)
-                ConsoleUI.displayErrorMessage("Name must not be empty!");
+            if (name.length() < 1)
+                ConsoleUI.printError("Name must not be empty!");
             else
                 break;
         }
@@ -34,94 +30,101 @@ public class UserService {
         int age = ConsoleUI.readInt("Enter age  : ");
 
         User user = new User(name, age);
-        if (users.containsKey(user.getId())) {
-            ConsoleUI.displayErrorMessage("ID already exists, Try an other one.");
-        } else {
-            users.put(user.getId(), user);
-            ConsoleUI.displaySuccessMessage("User added successfully.");
-        }
+        userRepo.save(user);
+        ConsoleUI.printSuccess("User added successfully.");
     }
 
     // Method to retrieve a user by their unique ID
     public User getUser() {
-        while (true) {
-            int id = ConsoleUI.readInt("\nEnter user id : ");
-            User user = users.get(id);
-            if (user != null)
-                return user;
-            else
-                ConsoleUI.displayErrorMessage("User not found !");
-        }
+        System.out.print("\nEnter user id : ");
+        String id = ConsoleUI.scanner.nextLine();
+        Optional<User> userFound = userRepo.find(id);
+        return userFound.orElse(null);
     }
 
     // Method to update an existing user
-    public void updateUser(User user) {
-        System.out.print("Enter new name (leave blank to keep current) : ");
-        String name = scanner.nextLine();
+    public void update(User user) {
+        System.out.print("Enter new name (leave blank to keep current): ");
+        String name = ConsoleUI.scanner.nextLine().trim();
         if (!name.isEmpty()) {
             user.setName(name);
         }
 
-        System.out.print("Enter new age (leave blank to keep current) : ");
-        String ageInput = scanner.nextLine();
+        System.out.print("Enter new age (leave blank to keep current): ");
+        String ageInput = ConsoleUI.scanner.nextLine();
         if (!ageInput.isEmpty()) {
-            int age = Integer.parseInt(ageInput);
-            user.setAge(age);
-        }
+            try {
+                int age = Integer.parseInt(ageInput);
+                user.setAge(age);
+            } catch (NumberFormatException e) {
+                ConsoleUI.printError("Invalid age format. Please enter a valid number.");
+                return;
+            }
+        } else if (name.isEmpty())
+            return; // No change to submit
 
-        ConsoleUI.displaySuccessMessage("User updated successfully!");
+        Optional<User> optionalUpdatedUser = userRepo.update(user);
+        if (optionalUpdatedUser.isPresent()) {
+            System.out.print(optionalUpdatedUser.get());
+            ConsoleUI.printSuccess("User updated successfully!");
+            return;
+        }
+        ConsoleUI.printError("Server Error!");
+    }
+
+    public void edit() {
+        User user = getUser();
+        if (user != null) {
+            System.out.println(user);
+            update(user);
+        } else
+            ConsoleUI.printError("User not found !");
     }
 
     // Method to delete a user by their unique ID
-    public void deleteUser(int id) {
-        if (users.containsKey(id)) {
-            users.remove(id);
-            ConsoleUI.displaySuccessMessage("User deleted successfully.");
+    public void remove(String id) {
+        Optional<User> user = userRepo.find(id);
+        if (user.isPresent()) {
+            userRepo.remove(user.get());
+            ConsoleUI.printSuccess("User deleted successfully.");
         } else
-            ConsoleUI.displayErrorMessage("Server Error!");
+            ConsoleUI.printError("Server Error!");
     }
 
-    // Show single user
-    public void showUser(User user) {
-        System.out.print(user);
-    }
-
-    // List all users
-    public void listAllUsers() {
-        if (users.isEmpty()) {
-            ConsoleUI.displayErrorMessage("No users available.");
-        } else {
-            for (User user : users.values()) {
-                showUser(user);
+    //
+    public void delete() {
+        User user = getUser();
+        if (user == null) ConsoleUI.printError("User not found !");
+        else {
+            System.out.println(user);
+            ConsoleUI.printWarning("Are you sur you want to delete this user (Y/N) : ");
+            String conf = ConsoleUI.scanner.nextLine();
+            if (conf.equalsIgnoreCase("y")) {
+                remove(user.getId());
+            } else {
+                ConsoleUI.printSuccess("Operation has been canceled successfully.");
             }
         }
     }
 
-    // Seeder
-    private void seeder() {
-        User user1 = new User("Alice", 30);
-        user1.addCarbonConsumption(new CarbonConsumption(100, LocalDate.of(2024, 1, 1), LocalDate.of(2024, 1, 5)));
-        user1.addCarbonConsumption(new CarbonConsumption(150, LocalDate.of(2024, 1, 10), LocalDate.of(2024, 1, 15)));
-        users.put(user1.getId(), user1);
+    // Show single user
+    public void showUser() {
+        User user = getUser();
+        if (user != null)
+            System.out.println(user);
+        else
+            ConsoleUI.printError("User not found !");
+    }
 
-        User user2 = new User("Bob", 25);
-        user2.addCarbonConsumption(new CarbonConsumption(200, LocalDate.of(2024, 2, 1), LocalDate.of(2024, 2, 5)));
-        user2.addCarbonConsumption(new CarbonConsumption(50, LocalDate.of(2024, 2, 10), LocalDate.of(2024, 2, 12)));
-        users.put(user2.getId(), user2);
-
-        User user3 = new User("Charlie", 35);
-        user3.addCarbonConsumption(new CarbonConsumption(80, LocalDate.of(2024, 3, 1), LocalDate.of(2024, 3, 3)));
-        user3.addCarbonConsumption(new CarbonConsumption(120, LocalDate.of(2024, 3, 5), LocalDate.of(2024, 3, 7)));
-        users.put(user3.getId(), user3);
-
-        User user4 = new User("David", 28);
-        user4.addCarbonConsumption(new CarbonConsumption(140, LocalDate.of(2024, 4, 1), LocalDate.of(2024, 4, 5)));
-        user4.addCarbonConsumption(new CarbonConsumption(90, LocalDate.of(2024, 4, 10), LocalDate.of(2024, 4, 12)));
-        users.put(user4.getId(), user4);
-
-        User user5 = new User("Eve", 40);
-        user5.addCarbonConsumption(new CarbonConsumption(200, LocalDate.of(2024, 5, 1), LocalDate.of(2024, 5, 5)));
-        user5.addCarbonConsumption(new CarbonConsumption(300, LocalDate.of(2024, 5, 6), LocalDate.of(2024, 5, 10)));
-        users.put(user5.getId(), user5);
+    // List all users
+    public void listAllUsers() {
+        List<User> users = userRepo.findAll();
+        if (users.isEmpty()) {
+            ConsoleUI.printError("No users available.");
+        } else {
+            for (User user : users) {
+                System.out.println(user);
+            }
+        }
     }
 }
