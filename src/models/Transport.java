@@ -9,12 +9,17 @@ public class Transport extends Consumption {
 
     private final double CAR_IMPACT = 0.5;
     private final double TRAIN_IMPACT = 0.1;
+
     private double distanceTravelled;
     private TransportType type;
 
-    public Transport(double distanceTravelled, String type){}
+    public Transport() {
+    }
 
-    public Transport(int quantity, LocalDate startDate, LocalDate endDate, double distanceTravelled, TransportType type) {
+    public Transport(double distanceTravelled, String type) {
+    }
+
+    public Transport(Double quantity, LocalDate startDate, LocalDate endDate, Double distanceTravelled, TransportType type) {
         super(quantity, startDate, endDate);
         this.distanceTravelled = distanceTravelled;
         this.type = type;
@@ -26,7 +31,7 @@ public class Transport extends Consumption {
         return distanceTravelled;
     }
 
-    public TransportType getType() {
+    public TransportType getTransportType() {
         return type;
     }
 
@@ -35,13 +40,22 @@ public class Transport extends Consumption {
         this.distanceTravelled = distanceTravelled;
     }
 
-    public void setType(TransportType type) {
+    public void setTransportType(TransportType type) {
         this.type = type;
     }
 
     // calculate impact
     @Override
-    Double calculateImpact() {
+    public Double calculateImpact() {
         return this.quantity * this.distanceTravelled * (this.type.equals(TransportType.CAR) ? CAR_IMPACT : TRAIN_IMPACT);
     }
+
+    @Override
+    public String toString() {
+        return super.toString() +
+                "distanceTravelled=" + distanceTravelled +
+                ", type=" + type +
+        '}';
+    }
+
 }

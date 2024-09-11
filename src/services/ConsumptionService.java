@@ -7,13 +7,15 @@ import enumerations.TransportType;
 import models.*;
 import repositories.ConsumptionRepository;
 import utils.ConsoleUI;
+import utils.DateUtil;
 
 import java.time.LocalDate;
 import java.util.*;
+import java.util.stream.Collectors;
 
 public class ConsumptionService {
 
-    private ConsumptionRepository consumptionRepo;
+    private final ConsumptionRepository consumptionRepo;
 
     public ConsumptionService() {
         this.consumptionRepo = new ConsumptionRepository();
@@ -33,7 +35,7 @@ public class ConsumptionService {
         consumptionTypeChoices.put("1", ConsumptionType.FOOD.toString());
         consumptionTypeChoices.put("2", ConsumptionType.HOUSING.toString());
         consumptionTypeChoices.put("3", ConsumptionType.TRANSPORT.toString());
-        String consumptionType = ConsoleUI.readChoice("\tEnter consumption type : ", consumptionTypeChoices);
+        String selectedConsumptionType = ConsoleUI.readChoice("\tEnter consumption type : ", consumptionTypeChoices);
 
         // Quantity
         Double quantity = ConsoleUI.readDouble("\tEnter the Quantity : ");
@@ -47,21 +49,21 @@ public class ConsumptionService {
 
             if (endDate.isBefore(startDate))
                 ConsoleUI.printError("Invalid Period! The end date should be after the start date!.");
-//            else if (!isAvailableDate(startDate, endDate, user.)) // TODO : Implement this method
-//                ConsoleUI.printError("Date range overlaps with an existing period!");
+            else if (!isValidatePeriodForType(startDate, endDate, ConsumptionType.valueOf(consumptionTypeChoices.get(selectedConsumptionType)), user))
+                ConsoleUI.printError("Overlaps with an existing period for this type!");
             else
                 break;
         }
 
         // Get other attributes depending on consumption type
-        Consumption consumption = getConsumptionInstance(consumptionType);
+        Consumption consumption = getConsumptionInstance(selectedConsumptionType);
         consumption.setQuantity(quantity);
         consumption.setStartDate(startDate);
         consumption.setEndDate(endDate);
         consumption.setUserId(user.getId());
 
         if (consumptionRepo.save(consumption).isPresent())
-            ConsoleUI.printSuccess("Consumption hav been saved successfully.");
+            ConsoleUI.printSuccess(consumption.getConsumptionType() + " has been created successfully.");
         else
             ConsoleUI.printError("Error whiting saving the consumption!");
     }
@@ -106,5 +108,45 @@ public class ConsumptionService {
                 return transport;
         }
         return null;
+    }
+
+    public Boolean isValidatePeriodForType(LocalDate startDate, LocalDate endDate, ConsumptionType type, User user) {
+        return getUserConsumptions(user)
+                .stream()
+                .filter(consumption -> consumption.getConsumptionType().equals(type))
+                .map(consumption -> {
+                    return DateUtil.getDatesBetween(consumption.getStartDate(), consumption.getEndDate());
+                })
+                .allMatch(dates -> {
+                    return DateUtil.isNoCommonDate(startDate, endDate, dates);
+                });
+    }
+
+    public void showUserConsumptions(User user) {
+        System.out.println("\tConsumptions : " + ConsoleUI.BLUE + getConsumptionsTotal(user) + ConsoleUI.RESET + " CO2eq");
+        getUserConsumptions(user).forEach(c -> {
+            String str = "\t#" + " : " + ConsoleUI.BLUE + String.format("%.2f", c.calculateImpact()) + ConsoleUI.RESET + " CO2eq" +
+                    " from " + c.getStartDate() +
+                    " to " + c.getEndDate() +
+                    " __ " + c.getConsumptionType().toString();
+            System.out.println(str);
+        });
+    }
+
+    public List<Consumption> getUserConsumptions(User user) {
+        List<Consumption> consumptionsList = new ArrayList<>();
+        consumptionsList.addAll(consumptionRepo.findByType(ConsumptionType.TRANSPORT));
+        consumptionsList.addAll(consumptionRepo.findByType(ConsumptionType.HOUSING));
+        consumptionsList.addAll(consumptionRepo.findByType(ConsumptionType.FOOD));
+
+        return consumptionsList.stream().filter(consumption -> consumption.getUserId().equals(user.getId()))
+                .collect(Collectors.toList());
+    }
+
+    // Consumption Total
+    public Double getConsumptionsTotal(User user) {
+        return getUserConsumptions(user).stream()
+                .mapToDouble(Consumption::calculateImpact)
+                .reduce(0, Double::sum);
     }
 }

@@ -15,7 +15,7 @@ public class Housing extends Consumption {
 
     public Housing(){}
 
-    public Housing(int quantity, LocalDate startDate, LocalDate endDate, EnergyType energyType, Double energyConsumption) {
+    public Housing(Double quantity, LocalDate startDate, LocalDate endDate, EnergyType energyType, Double energyConsumption) {
         super(quantity, startDate, endDate);
         this.energyType = energyType;
         this.energyConsumption = energyConsumption;
@@ -42,7 +42,15 @@ public class Housing extends Consumption {
 
     // calculate impact
     @Override
-    Double calculateImpact() {
+    public Double calculateImpact() {
         return this.quantity * this.energyConsumption * (this.energyType.equals(EnergyType.GAS) ? GAS_IMPACT : ELECTRICITY_IMPACT);
+    }
+
+    @Override
+    public String toString() {
+        return super.toString() +
+                "energyType=" + energyType+
+                ", energyConsumption=" + energyConsumption+
+                '}';
     }
 }

@@ -12,9 +12,11 @@ public class Food extends Consumption {
     private FoodType type;
     private Double weight;
 
-    public Food(){}
+    public Food(){
 
-    public Food(int quantity, LocalDate startDate, LocalDate endDate, FoodType type, Double weight) {
+    }
+
+    public Food(Double quantity, LocalDate startDate, LocalDate endDate, FoodType type, Double weight) {
         super(quantity, startDate, endDate);
         this.type = type;
         this.weight = weight;
@@ -22,7 +24,7 @@ public class Food extends Consumption {
     }
 
     // Getters
-    public FoodType getType() {
+    public FoodType getFoodType() {
         return type;
     }
 
@@ -31,17 +33,25 @@ public class Food extends Consumption {
     }
 
     // Setters
-    public void setType(FoodType type) {
+    public void setFoodType(FoodType type) {
         this.type = type;
     }
 
-    public void setWeight(double weight) {
+    public void setWeight(Double weight) {
         this.weight = weight;
     }
 
     // calculate impact
     @Override
-    Double calculateImpact() {
+    public Double calculateImpact() {
         return this.quantity * this.weight * ((this.type.equals(FoodType.MEAT) ? MEAT_IMPACT : VEGETABLE_IMPACT));
+    }
+
+    @Override
+    public String toString() {
+        return super.toString() +
+                "type=" + type +
+                ", weight=" + weight +
+                '}';
     }
 }

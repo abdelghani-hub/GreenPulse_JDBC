@@ -3,26 +3,26 @@ package models;
 import enumerations.ConsumptionType;
 
 import java.time.LocalDate;
-import java.util.concurrent.atomic.AtomicInteger;
+import java.util.UUID;
 
 public abstract class Consumption {
-    protected final int id;
-    protected int quantity;
+    protected String id;
+    protected Double quantity;
     protected LocalDate startDate;
     protected LocalDate endDate;
+    protected String userId;
     protected ConsumptionType consumptionType;
 
-    abstract Double calculateImpact();
-    private static final AtomicInteger idCounter = new AtomicInteger();
+    public abstract Double calculateImpact();
 
-    private int generateUniqueID() {
-        return idCounter.incrementAndGet();
+    private static String generateUniqueID() {
+        return UUID.randomUUID().toString();
     }
 
     public Consumption() {
         this.id = generateUniqueID();
     }
-    public Consumption(int quantity, LocalDate startDate, LocalDate endDate) {
+    public Consumption(Double quantity, LocalDate startDate, LocalDate endDate) {
         this.id = generateUniqueID();
         this.quantity = quantity;
         this.startDate = startDate;
@@ -30,11 +30,11 @@ public abstract class Consumption {
     }
 
     // Getters
-    public int getId() {
+    public String getId() {
         return id;
     }
 
-    public int getQuantity() {
+    public Double getQuantity() {
         return quantity;
     }
 
@@ -46,6 +46,10 @@ public abstract class Consumption {
         return endDate;
     }
 
+    public String getUserId() {
+        return userId;
+    }
+
     public ConsumptionType getConsumptionType() {
         return consumptionType;
     }
@@ -54,8 +58,11 @@ public abstract class Consumption {
     public void setStartDate(LocalDate startDate) {
         this.startDate = startDate;
     }
+    public void setId(String id) {
+        this.id = id;
+    }
 
-    public void setQuantity(int quantity) {
+    public void setQuantity(Double quantity) {
         this.quantity = quantity;
     }
 
@@ -65,5 +72,20 @@ public abstract class Consumption {
 
     public void setConsumptionType(ConsumptionType consumptionType) {
         this.consumptionType = consumptionType;
+    }
+
+    public void setUserId(String userId) {
+        this.userId = userId;
+    }
+
+    @Override
+    public String toString() {
+        return "Consumption{" +
+                "id='" + id + '\'' +
+                ", quantity=" + quantity +
+                ", startDate=" + startDate +
+                ", endDate=" + endDate +
+                ", userId='" + userId + '\'' +
+                ", consumptionType=" + consumptionType + ", ";
     }
 }

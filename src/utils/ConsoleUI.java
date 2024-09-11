@@ -57,7 +57,8 @@ public class ConsoleUI {
     }
 
     // Read Local Date
-    public static LocalDate readLocalDate() {
+    public static LocalDate readLocalDate(String prompt) {
+        System.out.print(prompt);
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy");
         LocalDate date = null;
         boolean valid = false;
@@ -93,7 +94,7 @@ public class ConsoleUI {
         return result;
     }
     // Method for handling the Input Mismatch Exception
-    public static double readDouble(String prompt) {
+    public static Double readDouble(String prompt) {
         double result = 0;
         boolean validInput = false;
 
@@ -111,18 +112,20 @@ public class ConsoleUI {
     }
 
     public static String readChoice(String prompt, Map<String, String> choices) {
-        StringBuilder choicesSTR = new StringBuilder("\t|------------------|\n");
+        StringBuilder choicesSTR = new StringBuilder();
+        choicesSTR.append("\t|------------------|\n");
         for (Map.Entry<String, String> choice : choices.entrySet()) {
-            choicesSTR.append(choice.getKey())
+            choicesSTR.append("\t ")
+                    .append(choice.getKey())
                     .append(". ")
                     .append(choice.getValue())
-                    .append("\n|__________________|\n")
-                    .append(prompt);
+                    .append("\n");
         }
+        choicesSTR.append("\t|__________________|\n").append(prompt);
         while (true) {
             System.out.print(choicesSTR);
             String choice = scanner.nextLine().trim();
-            if (!choices.containsValue(choice))
+            if (!choices.containsKey(choice))
                 printError("invalid choice!");
             else
                 return choice;

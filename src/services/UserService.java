@@ -30,8 +30,11 @@ public class UserService {
         int age = ConsoleUI.readInt("Enter age  : ");
 
         User user = new User(name, age);
-        userRepo.save(user);
-        ConsoleUI.printSuccess("User added successfully.");
+        Optional<User> userOptional = userRepo.save(user);
+        if (userOptional.isPresent())
+            ConsoleUI.printSuccess("User added successfully.");
+        else
+            ConsoleUI.printError("Failed !");
     }
 
     // Method to retrieve a user by their unique ID
@@ -108,23 +111,23 @@ public class UserService {
     }
 
     // Show single user
-    public void showUser() {
+    public User showUser() {
         User user = getUser();
-        if (user != null)
+        if (user != null){
             System.out.println(user);
-        else
-            ConsoleUI.printError("User not found !");
+            return user;
+        }
+        ConsoleUI.printError("User not found !");
+        return null;
     }
 
     // List all users
-    public void listAllUsers() {
+    public List<User> listAllUsers() {
         List<User> users = userRepo.findAll();
         if (users.isEmpty()) {
             ConsoleUI.printError("No users available.");
-        } else {
-            for (User user : users) {
-                System.out.println(user);
-            }
         }
+        return users;
     }
+
 }

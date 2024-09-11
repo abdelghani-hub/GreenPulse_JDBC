@@ -1,15 +1,16 @@
-import config.DBConnection;
 import models.User;
+import services.ConsumptionService;
 import services.UserService;
 import utils.ConsoleUI;
 
-import java.sql.Connection;
-import java.sql.SQLException;
+import java.util.List;
 
 public class Main {
-    private static final UserService userService = new UserService();
 
+    private static final UserService userService = new UserService();
+    private static final ConsumptionService consumptionService = new ConsumptionService();
     public static void main(String[] args) {
+
 
         boolean running = true;
 
@@ -28,13 +29,13 @@ public class Main {
                     userService.delete();
                     break;
                 case "4":
-                    userService.showUser();
+                    showUser();
                     break;
                 case "5":
-                    userService.listAllUsers();
+                    listAllUsers();
                     break;
                 case "6":
-                    //addCarbonConsumption();
+                    consumptionService.create();
                     break;
                 case "7":
 //                    generateCarbonReport();
@@ -49,31 +50,17 @@ public class Main {
         }
     }
 
+    public static void showUser(){
+        User user = userService.showUser();
+        if (user != null) consumptionService.showUserConsumptions(user);
+    }
+    public static void listAllUsers(){
+        List<User> users = userService.listAllUsers();
+        users.forEach(user -> {
+            System.out.println(user);
+            consumptionService.showUserConsumptions(user);
+        });
+    }
 
 
-    // Add Carbon Consumption
-    /*public static void addCarbonConsumption() {
-        User user = userService.getUser();
-//        CarbonConsumptionService.create(user);
-    }*/
-
-    // Generate Carbon Consumption Report
-/*    public static void generateCarbonReport() {
-        User user = userService.getUser();
-        ConsoleUI.displayReportMenu();
-        String reportChoice = ConsoleUI.scanner.nextLine();
-        switch (reportChoice) {
-            case "1":
-                CarbonConsumptionService.generateDailyReport(user);
-                break;
-            case "2":
-                CarbonConsumptionService.generateWeeklyReport(user);
-                break;
-            case "3":
-                CarbonConsumptionService.generateMonthlyReport(user);
-                break;
-            default:
-                ConsoleUI.displayErrorMessage("Invalid choice. Please try again.");
-        }
-    }*/
 }
