@@ -22,34 +22,37 @@ public class Main {
             String choice = ConsoleUI.scanner.nextLine();
 
             switch (choice) {
-                case "1":
+                case "0":
                     userService.addUser();
                     break;
-                case "2":
+                case "1":
                     userService.edit();
                     break;
-                case "3":
+                case "2":
                     userService.delete();
                     break;
-                case "4":
+                case "3":
                     showUser();
                     break;
-                case "5":
+                case "4":
                     listAllUsers();
                     break;
-                case "6":
+                case "5":
                     consumptionService.create();
                     break;
-                case "7":
+                case "6":
                     showActiveUsers();
                     break;
-                case "8":
+                case "7":
                     getImpactAverage();
                     break;
-                case "9":
+                case "8":
                     showInactiveUsers();
                     break;
-                case "0":
+                case "9":
+                    sortUsersByConsumption();
+                    break;
+                case "#":
                     running = false;
                     System.out.println("Exiting the application...");
                     break;
@@ -139,5 +142,23 @@ public class Main {
                     System.out.println(userRes);
                     consumptionService.showUserConsumptions(userRes);
                 });
+    }
+
+    // Sort Users By Consumption
+    public static void sortUsersByConsumption() {
+        List<User> users = userService.listAllUsers();
+        if (users.isEmpty()) {
+            ConsoleUI.printError("No users available.");
+            return;
+        }
+        users.sort((u1, u2) -> {
+            Double u1Total = consumptionService.getConsumptionsTotal(u1);
+            Double u2Total = consumptionService.getConsumptionsTotal(u2);
+            return u2Total.compareTo(u1Total);
+        });
+        users.forEach(user -> {
+            System.out.println(user);
+            System.out.println("\tConsumptions : " + ConsoleUI.BLUE + String.format("%.2f", consumptionService.getConsumptionsTotal(user)) + ConsoleUI.RESET + " CO2eq");
+        });
     }
 }

@@ -20,16 +20,17 @@ public class ConsoleUI {
                 "\n |=================================|" +
                         "\n |  " + ORANGE + "Carbon Consumption Management" + RESET + "  |" +
                         "\n |=================================|" +
-                        "\n | 1. Create User                  |" +
-                        "\n | 2. Update User                  |" +
-                        "\n | 3. Delete User                  |" +
-                        "\n | 4. Show User                    |" +
-                        "\n | 5. Show All users               |" +
-                        "\n | 6. Add Carbon Consumption       |" +
-                        "\n | 7. Show Active Users            |" +
-                        "\n | 8. Show Impact Average          |" +
-                        "\n | 9. Show Inactive Users          |" +
-                        "\n |" + BLUE + " 0. Exit" + RESET + "                         |" +
+                        "\n | 0. Create User                  |" +
+                        "\n | 1. Update User                  |" +
+                        "\n | 2. Delete User                  |" +
+                        "\n | 3. Show User                    |" +
+                        "\n | 4. Show All users               |" +
+                        "\n | 5. Add Carbon Consumption       |" +
+                        "\n | 6. Show Active Users            |" +
+                        "\n | 7. Show Impact Average          |" +
+                        "\n | 8. Show Inactive Users          |" +
+                        "\n | 9. Sort Users by Consumption    |" +
+                        "\n |" + BLUE + " #. Exit" + RESET + "                         |" +
                         "\n |_________________________________|" +
                         "\n  Enter your choice : "
         );
