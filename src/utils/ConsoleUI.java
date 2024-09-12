@@ -28,6 +28,7 @@ public class ConsoleUI {
                         "\n | 6. Add Carbon Consumption       |" +
                         "\n | 7. Show Active Users            |" +
                         "\n | 8. Show Impact Average          |" +
+                        "\n | 9. Show Inactive Users          |" +
                         "\n |" + BLUE + " 0. Exit" + RESET + "                         |" +
                         "\n |_________________________________|" +
                         "\n  Enter your choice : "

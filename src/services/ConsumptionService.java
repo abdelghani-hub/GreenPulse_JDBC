@@ -159,10 +159,12 @@ public class ConsumptionService {
         // Get period dates
         List<LocalDate> dates = DateUtil.getDatesBetween(startDate, endDate);
 
-        // 1) Get all user consumptions of the specified type
-        // 2) getAverageForEachDay for each consumption
-        // 3) filter days to only get the days in the period
-        // 4) get the averages for each day and return the result.sum / number of period days
+        /*
+            -> Get all user consumptions of the specified type
+            -> getAverageForEachDay for each consumption
+            -> filter days to only get the days in the period
+            -> get the averages for each day and return the result.sum / number of period days
+        */
         Map<LocalDate, Double> res = new TreeMap<>();
         consumptionRepo.findByType(type, user.getId())
                 .forEach(consumption -> {

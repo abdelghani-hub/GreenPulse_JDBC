@@ -2,6 +2,7 @@ import models.User;
 import services.ConsumptionService;
 import services.UserService;
 import utils.ConsoleUI;
+import utils.DateUtil;
 
 import java.time.LocalDate;
 import java.util.List;
@@ -40,10 +41,13 @@ public class Main {
                     consumptionService.create();
                     break;
                 case "7":
-                    getActiveUsers();
+                    showActiveUsers();
                     break;
                 case "8":
                     getImpactAverage();
+                    break;
+                case "9":
+                    showInactiveUsers();
                     break;
                 case "0":
                     running = false;
@@ -64,6 +68,10 @@ public class Main {
     // List all users
     public static void listAllUsers() {
         List<User> users = userService.listAllUsers();
+        if (users.isEmpty()) {
+            ConsoleUI.printError("No users available.");
+            return;
+        }
         users.forEach(user -> {
             System.out.println(user);
             consumptionService.showUserConsumptions(user);
@@ -71,7 +79,7 @@ public class Main {
     }
 
     // Show active users by min amount
-    public static void getActiveUsers() {
+    public static void showActiveUsers() {
         Double minAmount = ConsoleUI.readDouble("Enter the minimum amount : ");
         List<User> users = userService.listAllUsers().stream()
                 .filter(user -> consumptionService.getConsumptionsTotal(user) >= minAmount)
@@ -102,8 +110,34 @@ public class Main {
             return;
         }
 
-        // get impact average
+        // Show impact average
         consumptionService.showAveragesByPeriod(user, startDate, endDate);
+    }
 
+    // Show inactive users
+    public static void showInactiveUsers() {
+
+        LocalDate startDate = ConsoleUI.readLocalDate("Enter start date : ");
+        LocalDate endDate = ConsoleUI.readLocalDate("Enter end date : ");
+        // validate period
+        if (endDate.isBefore(startDate)) {
+            ConsoleUI.printError("Invalid Period! The end date should be after the start date!.");
+            return;
+        }
+
+        System.out.println("Inactive users " + startDate + " - " + endDate + " : ");
+        userService.listAllUsers()
+                .stream()
+                .filter(
+                        u -> consumptionService.getUserConsumptions(u)
+                                .stream()
+                                .allMatch(
+                                        c -> DateUtil.isNoCommonDate(startDate, endDate, DateUtil.getDatesBetween(c.getStartDate(), c.getEndDate()))
+                                )
+                )
+                .forEach(userRes -> {
+                    System.out.println(userRes);
+                    consumptionService.showUserConsumptions(userRes);
+                });
     }
 }
