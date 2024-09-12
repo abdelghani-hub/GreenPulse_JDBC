@@ -95,9 +95,12 @@ public class ConsumptionRepository implements RepositoryInterface<Consumption> {
     @Override
     public List<Consumption> findAll() {return null;}
 
-    public List<Consumption> findByType(ConsumptionType type) {
+    public List<Consumption> findByType(ConsumptionType type, String userId) {
         List<Consumption> consumptions = new ArrayList<>();
         String query = "SELECT * FROM " + type.toString().toLowerCase();
+        if(userId != null) {
+            query += " WHERE user_id = '" + userId + "'";
+        }
 
         try (Connection connection = DBConnection.getInstance().getConnection();
              PreparedStatement statement = connection.prepareStatement(query);

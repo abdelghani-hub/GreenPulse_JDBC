@@ -3,14 +3,16 @@ import services.ConsumptionService;
 import services.UserService;
 import utils.ConsoleUI;
 
+import java.time.LocalDate;
 import java.util.List;
+import java.util.stream.Collectors;
 
 public class Main {
 
     private static final UserService userService = new UserService();
     private static final ConsumptionService consumptionService = new ConsumptionService();
-    public static void main(String[] args) {
 
+    public static void main(String[] args) {
 
         boolean running = true;
 
@@ -38,9 +40,12 @@ public class Main {
                     consumptionService.create();
                     break;
                 case "7":
-//                    generateCarbonReport();
+                    getActiveUsers();
                     break;
                 case "8":
+                    getImpactAverage();
+                    break;
+                case "0":
                     running = false;
                     System.out.println("Exiting the application...");
                     break;
@@ -50,11 +55,14 @@ public class Main {
         }
     }
 
-    public static void showUser(){
+    // Show User infos
+    public static void showUser() {
         User user = userService.showUser();
         if (user != null) consumptionService.showUserConsumptions(user);
     }
-    public static void listAllUsers(){
+
+    // List all users
+    public static void listAllUsers() {
         List<User> users = userService.listAllUsers();
         users.forEach(user -> {
             System.out.println(user);
@@ -62,5 +70,40 @@ public class Main {
         });
     }
 
+    // Show active users by min amount
+    public static void getActiveUsers() {
+        Double minAmount = ConsoleUI.readDouble("Enter the minimum amount : ");
+        List<User> users = userService.listAllUsers().stream()
+                .filter(user -> consumptionService.getConsumptionsTotal(user) >= minAmount)
+                .collect(Collectors.toList());
+        if (users.isEmpty()) {
+            ConsoleUI.printError("No active users found.");
+        } else {
+            users.forEach(user -> {
+                System.out.println(user);
+                consumptionService.showUserConsumptions(user);
+            });
+        }
+    }
 
+    // Get impact average for a user in a specified period
+    public static void getImpactAverage() {
+        User user = userService.getUser();
+        if (user == null) {
+            ConsoleUI.printError("User not found!");
+            return;
+        }
+        LocalDate startDate = ConsoleUI.readLocalDate("Enter start date : ");
+        LocalDate endDate = ConsoleUI.readLocalDate("Enter end date : ");
+
+        // validate period
+        if (endDate.isBefore(startDate)) {
+            ConsoleUI.printError("Invalid Period! The end date should be after the start date!.");
+            return;
+        }
+
+        // get impact average
+        consumptionService.showAveragesByPeriod(user, startDate, endDate);
+
+    }
 }

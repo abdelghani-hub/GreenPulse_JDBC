@@ -10,7 +10,7 @@ public class ConsoleUI {
     public static final String RESET = "\u001B[0m";
     public static final String YELLOW = "\u001B[33m";
     public static final String RED = "\u001B[31m";
-    public static final String GREEN = "\u001B[32m";
+    public static final String GREEN = "\u001B[92m";
     public static final String BLUE = "\u001B[34m";
     public static final String ORANGE = "\u001B[38;5;214m";
     public static final Scanner scanner = new Scanner(System.in);
@@ -26,8 +26,9 @@ public class ConsoleUI {
                         "\n | 4. Show User                    |" +
                         "\n | 5. Show All users               |" +
                         "\n | 6. Add Carbon Consumption       |" +
-                        "\n | 7. Generate Carbon report       |" +
-                        "\n |" + BLUE + " 8. Exit" + RESET + "                         |" +
+                        "\n | 7. Show Active Users            |" +
+                        "\n | 8. Show Impact Average          |" +
+                        "\n |" + BLUE + " 0. Exit" + RESET + "                         |" +
                         "\n |_________________________________|" +
                         "\n  Enter your choice : "
         );
@@ -53,7 +54,7 @@ public class ConsoleUI {
     }
 
     public static void printWarning(String message) {
-        System.out.print(YELLOW + "\nWarning: " + message + RESET);
+        System.out.print(ORANGE + "\nWarning: " + message + RESET);
     }
 
     // Read Local Date
@@ -114,13 +115,11 @@ public class ConsoleUI {
     public static String readChoice(String prompt, Map<String, String> choices) {
         StringBuilder choicesSTR = new StringBuilder();
         choicesSTR.append("\t|------------------|\n");
-        for (Map.Entry<String, String> choice : choices.entrySet()) {
-            choicesSTR.append("\t ")
-                    .append(choice.getKey())
-                    .append(". ")
-                    .append(choice.getValue())
-                    .append("\n");
-        }
+        choices.forEach((key, value) -> choicesSTR.append("\t ")
+                .append(key)
+                .append(". ")
+                .append(value)
+                .append("\n"));
         choicesSTR.append("\t|__________________|\n").append(prompt);
         while (true) {
             System.out.print(choicesSTR);

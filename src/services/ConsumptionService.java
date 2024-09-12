@@ -11,7 +11,6 @@ import utils.DateUtil;
 
 import java.time.LocalDate;
 import java.util.*;
-import java.util.stream.Collectors;
 
 public class ConsumptionService {
 
@@ -123,7 +122,7 @@ public class ConsumptionService {
     }
 
     public void showUserConsumptions(User user) {
-        System.out.println("\tConsumptions : " + ConsoleUI.BLUE + getConsumptionsTotal(user) + ConsoleUI.RESET + " CO2eq");
+        System.out.println("\tConsumptions : " + ConsoleUI.BLUE + String.format("%.2f", getConsumptionsTotal(user)) + ConsoleUI.RESET + " CO2eq");
         getUserConsumptions(user).forEach(c -> {
             String str = "\t#" + " : " + ConsoleUI.BLUE + String.format("%.2f", c.calculateImpact()) + ConsoleUI.RESET + " CO2eq" +
                     " from " + c.getStartDate() +
@@ -135,12 +134,11 @@ public class ConsumptionService {
 
     public List<Consumption> getUserConsumptions(User user) {
         List<Consumption> consumptionsList = new ArrayList<>();
-        consumptionsList.addAll(consumptionRepo.findByType(ConsumptionType.TRANSPORT));
-        consumptionsList.addAll(consumptionRepo.findByType(ConsumptionType.HOUSING));
-        consumptionsList.addAll(consumptionRepo.findByType(ConsumptionType.FOOD));
+        consumptionsList.addAll(consumptionRepo.findByType(ConsumptionType.TRANSPORT, user.getId()));
+        consumptionsList.addAll(consumptionRepo.findByType(ConsumptionType.HOUSING, user.getId()));
+        consumptionsList.addAll(consumptionRepo.findByType(ConsumptionType.FOOD, user.getId()));
 
-        return consumptionsList.stream().filter(consumption -> consumption.getUserId().equals(user.getId()))
-                .collect(Collectors.toList());
+        return consumptionsList;
     }
 
     // Consumption Total
@@ -148,5 +146,42 @@ public class ConsumptionService {
         return getUserConsumptions(user).stream()
                 .mapToDouble(Consumption::calculateImpact)
                 .reduce(0, Double::sum);
+    }
+
+    public void showAveragesByPeriod(User user, LocalDate start, LocalDate end) {
+        System.out.println("\tAVGs of period from " + start + " to " + end + " : ");
+        System.out.println("\t\tTransport : " + ConsoleUI.BLUE + String.format("%.2f", getTypeAverages(start, end, ConsumptionType.TRANSPORT, user)) + ConsoleUI.RESET + " CO2eq");
+        System.out.println("\t\tHousing   : " + ConsoleUI.BLUE + String.format("%.2f", getTypeAverages(start, end, ConsumptionType.HOUSING, user)) + ConsoleUI.RESET + " CO2eq");
+        System.out.println("\t\tFood      : " + ConsoleUI.BLUE + String.format("%.2f", getTypeAverages(start, end, ConsumptionType.FOOD, user)) + ConsoleUI.RESET + " CO2eq");
+    }
+
+    public Double getTypeAverages(LocalDate startDate, LocalDate endDate, ConsumptionType type, User user) {
+        // Get period dates
+        List<LocalDate> dates = DateUtil.getDatesBetween(startDate, endDate);
+
+        // 1) Get all user consumptions of the specified type
+        // 2) getAverageForEachDay for each consumption
+        // 3) filter days to only get the days in the period
+        // 4) get the averages for each day and return the result.sum / number of period days
+        Map<LocalDate, Double> res = new TreeMap<>();
+        consumptionRepo.findByType(type, user.getId())
+                .forEach(consumption -> {
+                    getAverageForEachDay(consumption)
+                            .forEach((date, average) -> {
+                                if (dates.contains(date)) {
+                                    res.merge(date, average, Double::sum);
+                                }
+                            });
+                });
+        return res.values().stream().mapToDouble(Double::doubleValue).sum() / dates.size();
+    }
+
+    public Map<LocalDate, Double> getAverageForEachDay(Consumption consumption) {
+        Map<LocalDate, Double> datesAverage = new TreeMap<>();
+        DateUtil.getDatesBetween(consumption.getStartDate(), consumption.getEndDate())
+                .forEach(date -> {
+                    datesAverage.put(date, consumption.calculateImpact() / (DateUtil.getDatesBetween(consumption.getStartDate(), consumption.getEndDate()).size()));
+                });
+        return datesAverage;
     }
 }
