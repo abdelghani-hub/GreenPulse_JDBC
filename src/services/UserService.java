@@ -123,10 +123,6 @@ public class UserService {
 
     // List all users
     public List<User> listAllUsers() {
-        List<User> users = userRepo.findAll();
-        if (users.isEmpty()) {
-            ConsoleUI.printError("No users available.");
-        }
-        return users;
+        return userRepo.findAll();
     }
 }
