@@ -1,8 +1,12 @@
 package utils;
 
+import java.text.DecimalFormat;
+import java.text.DecimalFormatSymbols;
+import java.text.NumberFormat;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Scanner;
 
@@ -33,17 +37,6 @@ public class ConsoleUI {
                         "\n |" + BLUE + " #. Exit" + RESET + "                         |" +
                         "\n |_________________________________|" +
                         "\n  Enter your choice : "
-        );
-    }
-
-    public static void displayReportMenu() {
-        System.out.print(
-                "\n\t |----------------------|" +
-                "\n\t | 1. Daily Report      |" +
-                "\n\t | 2. Weekly Report     |" +
-                "\n\t | 3. Monthly Report    |" +
-                "\n\t |______________________|" +
-                "\n\t\tEnter report choice : "
         );
     }
 
@@ -131,5 +124,10 @@ public class ConsoleUI {
             else
                 return choice;
         }
+    }
+
+    // method to show doubles in format : 0 000 000.00
+    public static String formatDouble(Double value) {
+        return NumberFormat.getNumberInstance(Locale.US).format(value);
     }
 }

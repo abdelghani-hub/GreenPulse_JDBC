@@ -138,7 +138,7 @@ public class MainService {
         });
         users.forEach(user -> {
             System.out.println(user);
-            System.out.println("\tConsumptions : " + ConsoleUI.BLUE + String.format("%.2f", consumptionService.getConsumptionsTotal(user)) + ConsoleUI.RESET + " CO2eq");
+            System.out.println("\tConsumptions : " + ConsoleUI.BLUE + ConsoleUI.formatDouble(consumptionService.getConsumptionsTotal(user)) + ConsoleUI.RESET + " CO2eq");
         });
     }
 

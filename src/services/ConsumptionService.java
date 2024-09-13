@@ -122,12 +122,12 @@ public class ConsumptionService {
     }
 
     public void showUserConsumptions(User user) {
-        System.out.println("\tConsumptions : " + ConsoleUI.BLUE + String.format("%.2f", getConsumptionsTotal(user)) + ConsoleUI.RESET + " CO2eq");
+        System.out.println("\tConsumptions : " + ConsoleUI.BLUE + ConsoleUI.formatDouble(getConsumptionsTotal(user)) + ConsoleUI.RESET + " CO2eq");
         getUserConsumptions(user).forEach(c -> {
-            String str = "\t#" + " : " + ConsoleUI.BLUE + String.format("%.2f", c.calculateImpact()) + ConsoleUI.RESET + " CO2eq" +
+            String str = "\t#" + " : " + ConsoleUI.BLUE + ConsoleUI.formatDouble(c.calculateImpact()) + ConsoleUI.RESET + " CO2eq" +
                     " from " + c.getStartDate() +
                     " to " + c.getEndDate() +
-                    " __ " + c.getConsumptionType().toString();
+                    " -- " + c.getConsumptionType().toString();
             System.out.println(str);
         });
     }
@@ -150,9 +150,9 @@ public class ConsumptionService {
 
     public void showAveragesByPeriod(User user, LocalDate start, LocalDate end) {
         System.out.println("\tAVGs of period from " + start + " to " + end + " : ");
-        System.out.println("\t\tTransport : " + ConsoleUI.BLUE + String.format("%.2f", getTypeAverages(start, end, ConsumptionType.TRANSPORT, user)) + ConsoleUI.RESET + " CO2eq");
-        System.out.println("\t\tHousing   : " + ConsoleUI.BLUE + String.format("%.2f", getTypeAverages(start, end, ConsumptionType.HOUSING, user)) + ConsoleUI.RESET + " CO2eq");
-        System.out.println("\t\tFood      : " + ConsoleUI.BLUE + String.format("%.2f", getTypeAverages(start, end, ConsumptionType.FOOD, user)) + ConsoleUI.RESET + " CO2eq");
+        System.out.println("\t\tTransport : " + ConsoleUI.BLUE + ConsoleUI.formatDouble(getTypeAverages(start, end, ConsumptionType.TRANSPORT, user)) + ConsoleUI.RESET + " CO2eq");
+        System.out.println("\t\tHousing   : " + ConsoleUI.BLUE + ConsoleUI.formatDouble(getTypeAverages(start, end, ConsumptionType.HOUSING, user)) + ConsoleUI.RESET + " CO2eq");
+        System.out.println("\t\tFood      : " + ConsoleUI.BLUE + ConsoleUI.formatDouble(getTypeAverages(start, end, ConsumptionType.FOOD, user)) + ConsoleUI.RESET + " CO2eq");
     }
 
     public Double getTypeAverages(LocalDate startDate, LocalDate endDate, ConsumptionType type, User user) {
